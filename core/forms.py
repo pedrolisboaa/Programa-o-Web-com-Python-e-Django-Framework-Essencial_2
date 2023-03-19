@@ -1,6 +1,8 @@
 from django import forms
 from django.core.mail.message import EmailMessage
+from .models import Produto
 
+# Somente os dados (tipo para e-mail)
 class ContatoForm(forms.Form):
     nome = forms.CharField(label='Nome', max_length=150)
     email = forms.EmailField(label='E-mail', max_length=150)
@@ -23,3 +25,11 @@ class ContatoForm(forms.Form):
             headers={'Reply-To': email},
         )
         mail.send()
+        
+
+# Integração com a base de dado
+class ProduutoModelForm(forms.ModelForm):
+    class Meta:
+        model = Produto
+        fields = ['nome', 'preco', 'estoque', 'imagem']
+    
