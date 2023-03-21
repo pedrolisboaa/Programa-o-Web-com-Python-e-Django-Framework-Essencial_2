@@ -1,11 +1,16 @@
 from django.shortcuts import render
 from django.contrib import messages
-from .forms import ContatoForm, ProduutoModelForm
+from .forms import ContatoForm, ProdutoModelForm
+from .models import Produto
+from django.shortcuts import redirect
 
 # Create your views here.
 
 def index(request):
-    return render(request, 'index.html')
+    context = {
+        'produtos': Produto.objects.all()
+    }
+    return render(request, 'index.html', context)
 
 def contato(request):
     form = ContatoForm(request.POST or None)
@@ -22,24 +27,24 @@ def contato(request):
 
 def produto(request):
     
-    if str(request.method) == 'POST':
-        form = ProduutoModelForm(request.POST, request.FILES)
-        if form.is_valid():
-            prod = form.save(commit=False)
-            
-            print(f' Nome: {prod.nome}')
-            print(f' Preco: {prod.preco}')
-            print(f' Estoque: {prod.estoque}')
-            print(f' Imagem: {prod.imagem}')
-            
-            messages.success(request, 'Produto salvo com sucesso.')
-            form = ProduutoModelForm()
+    print(f'Usuário: {request.user}')
+    
+    if str(request.user) != "AnonymousUser":
+        if str(request.method) == 'POST':
+            form = ProdutoModelForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Produto salvo com sucesso.')
+                form = ProdutoModelForm()
+            else:
+                messages.error(request, 'Erro ao salvar')
         else:
-            messages.error(request, 'Erro ao salvar')
+            form = ProdutoModelForm()
+            
+        context = {
+            'form': form
+        }
+    
+        return render(request, 'produto.html', context)
     else:
-        form = ProduutoModelForm()
-        
-    context = {
-        'form': form
-    }
-    return render(request, 'produto.html', context)
+        return redirect('index')

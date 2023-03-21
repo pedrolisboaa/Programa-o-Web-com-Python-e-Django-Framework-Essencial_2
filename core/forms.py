@@ -28,7 +28,7 @@ class ContatoForm(forms.Form):
         
 
 # Integração com a base de dado
-class ProduutoModelForm(forms.ModelForm):
+class ProdutoModelForm(forms.ModelForm):
     class Meta:
         model = Produto
         fields = ['nome', 'preco', 'estoque', 'imagem']
